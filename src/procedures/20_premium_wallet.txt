@@ -1,0 +1,24 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `premium_wallet`(IN `premium` CHAR(1), IN `username` VARCHAR(50))
+BEGIN
+	DECLARE account_id int(5);
+	DECLARE wallet_id1 int(5);
+	DECLARE premium_stat char(1);
+    DECLARE c_id int(5);
+	
+    SET c_id = (SELECT customer_id from customer where customer.email=username);
+    
+	SET wallet_id1 =(SELECT wallet.wallet_id FROM wallet WHERE wallet.customer_id=c_id limit 1);
+  
+	
+	IF premium_stat='y' THEN
+		update wallet set wallet.wallet_balance=wallet.wallet_balance-500 where wallet.wallet_id=wallet_id1;
+	END IF;
+    
+END$$
+DELIMITER ;
+
+
+
+
+

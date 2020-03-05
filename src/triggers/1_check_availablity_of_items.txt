@@ -1,0 +1,14 @@
+CREATE TRIGGER `avail` BEFORE INSERT ON `order_details`
+ FOR EACH ROW BEGIN
+	DECLARE av int(11);
+	DECLARE msg varchar(50);
+	
+	SET av= (SELECT food_item.availability from food_item WHERE food_item.item_id=new.item_id);
+   
+	IF av>0 and av>new.qty THEN 
+		UPDATE food_item set food_item.availability =(av-new.qty) where food_item.item_id=new.item_id; 
+	ELSE
+		SET msg= concat('SOLD OUT! You can order',av-new.qty);
+		signal sqlstate '45001' set message_text = msg; 
+	END IF;
+END

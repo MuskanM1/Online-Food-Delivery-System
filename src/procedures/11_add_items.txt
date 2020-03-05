@@ -1,0 +1,13 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `orderDetailsInsert`(IN `cust_id` INT, IN `qty1` INT, IN `it_id` INT)
+BEGIN
+	DECLARE order_id int(5);
+	DECLARE pr,final_pr int(11);
+
+	set order_id = (select max(order_no) from orders where orders.customer_id=cust_id);
+	set pr = (select food_item.price from food_item where food_item.item_id=it_id);
+	set final_pr = (pr*qty1);
+
+	insert into order_details(order_no, item_id, price, qty, final_price) values(order_id, it_id, pr, qty1, final_pr);
+END$$
+DELIMITER ;

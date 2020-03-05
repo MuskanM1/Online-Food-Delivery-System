@@ -1,0 +1,71 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `display`(IN `customer_id` INT)
+BEGIN
+	DECLARE name varchar(30);	
+	DECLARE b int;
+    DECLARE qty int;
+    DECLARE a int;
+	DECLARE c int;
+    DECLARE d int;
+    DECLARE price1 int(11);
+    DECLARE order_time TIMESTAMP;
+    DECLARE bill_amt,disc,final_price int;
+    DECLARE temp_item_id int;
+	DECLARE temp_order_no int;
+	BLOCK1: BEGIN
+ 	DECLARE cur1 CURSOR FOR SELECT orders.order_no from orders where orders.customer_id = customer_id;
+        DECLARE CONTINUE HANDLER FOR NOT FOUND SET b = 1;
+        OPEN cur1;     
+        SET b = 0;
+        FETCH cur1 INTO a;
+        WHILE b = 0 DO
+		set temp_order_no = a;
+
+		set order_time = (select orders.order_time from orders where orders.order_no = temp_order_no);
+	
+
+		BLOCK2: BEGIN
+		DECLARE cur2 CURSOR FOR SELECT order_details.item_id from order_details where order_details.order_no = temp_order_no;
+       		DECLARE CONTINUE HANDLER FOR NOT FOUND SET c = 1;
+        	OPEN cur2;     
+        	SET c = 0;
+        	FETCH cur2 INTO d;
+		WHILE c = 0 DO
+			set temp_item_id = d;
+			set name = (select food_item.item_name from food_item where food_item.item_id=d);
+	
+			set qty = (select order_details.qty from order_details where order_details.order_no=temp_order_no and item_id = d);
+
+			set price1 = (select price from order_details where order_details.order_no=temp_order_no and item_id = d);
+
+                         
+
+		FETCH cur2 into d;	
+		END WHILE;
+		CLOSE cur2;
+		END BLOCK2;
+
+		set bill_amt = (select bill.bill_amount from bill where bill.order_no = temp_order_no limit 1);
+
+		set disc = (select bill.discount from bill where bill.order_no = temp_order_no limit 1);
+
+		set final_price = (select bill.bill_total from bill where bill.order_no = temp_order_no limit 1);
+
+                select temp_order_no as order_no,order_time,temp_item_id as item_id, name,qty,price1 as Price,bill_amt as bill_amount,disc as discount,final_price;
+		
+        FETCH cur1 INTO a;
+        END WHILE;
+        CLOSE cur1;
+	END BLOCK1;
+END$$
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+

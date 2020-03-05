@@ -1,0 +1,81 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `restaurant_details3`()
+BEGIN
+     DECLARE a int;
+     DECLARE z int;
+     DECLARE order_N int;
+     DECLARE temp_order_no int;
+     DECLARE temp_rest_id int;
+     DECLARE b,r int;
+     DECLARE c varchar(10);
+     DECLARE name varchar(20);
+     DECLARE city varchar(20);
+     DECLARE temp_name varchar(20);
+     DECLARE temp_city varchar(20);
+     DECLARE d int;
+     DECLARE e,f time;
+     DECLARE g char(10);
+     
+     BLOCK1: BEGIN
+     DECLARE cur1 cursor for select restaurant_id from restaurant;
+     DECLARE continue handler for not found set b = 1;
+     open cur1;
+     set b=0;
+     set r=0;
+     set z=0;
+     fetch cur1 into a;
+     WHILE b = 0 DO
+	set temp_rest_id = a;
+	set c = (select restaurant_name from restaurant where restaurant_id=temp_rest_id);
+	
+	set d = (select no_of_branches from restaurant where restaurant_id=temp_rest_id);
+	
+        set e = (select open_time from restaurant where restaurant_id = temp_rest_id);
+        
+        set f = (select close_time from restaurant where restaurant_id = temp_rest_id);
+        
+        set g = (select contact from restaurant where restaurant_id = temp_rest_id);
+        
+        
+        BLOCK2: BEGIN 
+        DECLARE cur2 cursor FOR SELECT branch_name,branch_city from branch where branch.restaurant_id = temp_rest_id;
+        DECLARE CONTINUE HANDLER FOR NOT FOUND SET z = 1; 
+     open cur2;
+     set z=0;
+     fetch cur2 into name,city;
+     WHILE z = 0 DO
+	 set temp_name = name;
+     set temp_city = city;
+     
+
+        BLOCK3: BEGIN
+	DECLARE cur3 CURSOR FOR SELECT count(order_no) from orders where orders.restaurant_id = temp_rest_id;
+        DECLARE CONTINUE HANDLER FOR NOT FOUND SET r = 1;
+        SET r = 0;        
+        OPEN cur3;     
+        SET r = 0;
+        FETCH cur3 INTO order_N;
+        WHILE r = 0 DO
+		set temp_order_no = order_N;
+        	select temp_rest_id ,c ,d ,e ,f ,g ,temp_name ,temp_city ,temp_order_no;
+		FETCH cur3 INTO order_N;
+        end while;
+        CLOSE cur3;
+        END BLOCK3;
+        
+     FETCH cur2 INTO name, city;
+        end while;
+        CLOSE cur2;
+        END BLOCK2;
+ 
+
+	FETCH cur1 into a;
+    end while;
+	CLOSE cur1;
+	END BLOCK1;
+END$$
+DELIMITER ;
+
+
+
+

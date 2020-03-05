@@ -1,0 +1,15 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `register1`(IN `username` VARCHAR(50), IN `name` VARCHAR(20), IN `password1` VARCHAR(20), IN `phone` CHAR(10), IN `premium_member1` CHAR(1), IN `role1` CHAR(1))
+BEGIN
+	DECLARE id int(5);
+	INSERT INTO registration(username, premium_member,registration_time) VALUES (username, premium_member1,CURRENT_TIMESTAMP);
+
+ 	INSERT INTO customer(customer_name, contact, email) VALUES (name, phone, username);
+
+	SET id = (select customer.customer_id from customer where customer.email=username);
+	INSERT INTO wallet(customer_id,wallet_balance) values(id,100000);
+
+	INSERT INTO account(account.username, account.password, account.role) VALUES (username, password1, role1);
+	
+END$$
+DELIMITER ;

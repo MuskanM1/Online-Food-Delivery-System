@@ -1,0 +1,28 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `admin_login`(IN `username1` VARCHAR(50), IN `pass` VARCHAR(30), OUT `flag` INT)
+BEGIN
+        DECLARE b int;
+        DECLARE a varchar(50);
+	DECLARE c varchar(30);
+ 	DECLARE cur1 CURSOR FOR SELECT account.username,account.password FROM account where role='A';
+        DECLARE CONTINUE HANDLER FOR NOT FOUND SET b = 1;
+        SET b = 0;
+        SET flag = 0;        
+        OPEN cur1;  
+        FETCH cur1 INTO a,c;
+        WHILE b = 0 DO
+        if (a=username1) and (c=pass) then
+			set flag = 1;
+            
+	    end if;
+        FETCH cur1 INTO a,c;
+        END WHILE;
+        CLOSE cur1;
+END$$
+DELIMITER ;
+
+
+
+
+
+

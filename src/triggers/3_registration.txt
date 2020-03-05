@@ -1,0 +1,21 @@
+CREATE TRIGGER `trigger1` BEFORE INSERT ON `registration`
+ FOR EACH ROW BEGIN
+	DECLARE b int;
+	DECLARE a varchar(50);
+	DECLARE msg varchar(100);
+	DECLARE cur CURSOR FOR SELECT username from registration;
+	DECLARE CONTINUE HANDLER FOR NOT FOUND SET b = 1;
+	 OPEN cur;
+   	 SET b = 0;
+	FETCH cur INTO a;
+  	  WHILE b = 0 DO
+		if a=new.username then
+			set msg = 'Error: Not allowed to insert same username....';
+      			signal sqlstate '45006' set message_text = msg; 
+		end if;	
+	   FETCH cur INTO a;
+
+	 END WHILE;
+	CLOSE cur;
+END
+

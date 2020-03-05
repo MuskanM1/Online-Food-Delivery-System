@@ -1,0 +1,11 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `orderInsert`(IN `cust_id` INT(5),               IN `rest_id` INT(5))
+BEGIN
+	DECLARE deli_add_id int(5);
+	
+	set deli_add_id = (select delivery_address.delivery_address_id from delivery_address where delivery_address.customer_id=cust_id limit 1);
+	
+	insert into orders(customer_id, delivery_address_id, restaurant_id, order_status) values(cust_id, deli_add_id, rest_id, 'confirmed');
+
+END$$
+DELIMITER ;

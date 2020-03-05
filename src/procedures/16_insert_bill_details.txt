@@ -1,0 +1,36 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `bill_details4`(IN `cust_id` INT(5))
+BEGIN
+	DECLARE fee,bill_amt,bill_total,discount int(11);
+    DECLARE count1,o_no,order_id int(5);
+    DECLARE q int(11);
+    DECLARE p int(11);
+    DECLARE b int;
+
+    DECLARE cur CURSOR FOR SELECT price,qty FROM order_details where order_details.order_no = (select max(orders.order_no) from orders where orders.customer_id=cust_id limit 1);
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET b = 1;
+    SET bill_amt=0;
+    SET fee=(SELECT delivery.delivery_fee from orders,delivery where delivery.order_no = (select max(order_no) from orders where customer_id=cust_id) limit 1);
+
+    OPEN cur;
+    SET b = 0;
+    set fee=0;
+    FETCH cur INTO p,q;
+    WHILE b = 0 DO
+    
+    	SET bill_amt=bill_amt+(p*q);
+       
+        FETCH cur INTO p,q;
+    END WHILE;
+	select bill_amt;
+    
+    set order_id = (select max(orders.order_no) from orders where orders.customer_id=cust_id);
+   
+     set discount = 0;
+    set discount = (select max(offer.offer_id) from offer where offer.customer_id=cust_id and offer.validity_date>=CURRENT_DATE);
+	
+    set bill_total = bill_amt - (bill_amt*discount)/100;
+    insert into bill(order_no,bill_amount,discount,bill_total,delivery_fee) values(order_id,bill_amt,discount,bill_total,fee);
+    CLOSE cur;
+END$$
+DELIMITER ;

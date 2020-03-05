@@ -1,0 +1,6 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `feedback1`(IN `order_no` INT(5), `cust_id` INT(5), `rating` INT(11), `comment1` VARCHAR(20))
+BEGIN
+	INSERT INTO feedback(customer_id,feedback.order_no,feedback.rating,feedback.comment) values(cust_id,order_no,rating, comment1); 
+END$$
+DELIMITER ;

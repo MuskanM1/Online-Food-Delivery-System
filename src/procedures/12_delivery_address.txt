@@ -1,0 +1,6 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deliveryAddress_insert`(IN `house_no1` VARCHAR(10), IN `street_no1` VARCHAR(10), IN `area1` VARCHAR(20), IN `city1` VARCHAR(20), IN `pincode1` CHAR(6), IN `customer_id` INT(5))
+BEGIN
+	INSERT INTO delivery_address(house_no,street_no,area,city,pincode,customer_id) values(house_no1, street_no1, area1, city1, pincode1,customer_id);
+END$$
+DELIMITER ;

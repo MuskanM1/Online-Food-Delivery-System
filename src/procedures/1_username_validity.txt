@@ -1,0 +1,25 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `chk_user`(IN `uname` VARCHAR(50), OUT `flag` INT)
+BEGIN
+	DECLARE pos int;
+    DECLARE sub varchar(50);
+     DECLARE b int;
+    DECLARE a varchar(50);
+     DECLARE cur2 CURSOR FOR SELECT username1 FROM utable;
+     DECLARE CONTINUE HANDLER FOR NOT FOUND SET b = 1;
+	If (POSITION("@" IN uname) >0 or POSITION("." IN uname) >0 or POSITION("_" IN uname) >0) THEN
+        	SET pos= POSITION("@" IN uname);
+            SET sub= SUBSTR(uname,pos+1);
+            OPEN cur2;
+            SET b = 0;
+            WHILE b = 0 DO
+            FETCH cur2 INTO a;
+                 if (a=sub) THEN
+                 	set flag=1;
+                 end if;
+            END WHILE;
+            CLOSE cur2;
+     END if;
+
+END$$
+DELIMITER ;

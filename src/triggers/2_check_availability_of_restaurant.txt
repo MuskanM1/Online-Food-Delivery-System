@@ -1,0 +1,12 @@
+CREATE TRIGGER `check_restro` BEFORE INSERT ON `orders`
+ FOR EACH ROW BEGIN
+	DECLARE a,b,c time;
+    DECLARE msg varchar(128);
+	SET c=CURRENT_TIMESTAMP;
+    SET a=(SELECT open_time from restaurant where restaurant_id=new.restaurant_id);
+    SET b=(SELECT close_time from restaurant where restaurant_id=new.restaurant_id);
+    IF c NOT BETWEEN CONVERT(a,TIME) AND CONVERT(b,TIME) THEN
+    	set msg = 'Restaurant is closed!'; 
+        signal sqlstate '45001' set message_text = msg;
+    END IF;
+END

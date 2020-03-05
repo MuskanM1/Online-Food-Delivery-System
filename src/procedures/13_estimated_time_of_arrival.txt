@@ -1,0 +1,42 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `eta`(IN `cust_id` INT(5), IN `restaurant_id1` INT(5))
+begin
+    Declare b,min int;
+    Declare a,c char(6);
+    Declare eta int;
+    Declare pin char(6);
+    DECLARE order_id,did int(5);
+    
+    Declare cur1 cursor for select b.pincode from branch b,restaurant r where r.restaurant_id = restaurant_id1 and b.restaurant_id = r.restaurant_id;
+    Declare continue handler for not found set b = 1;
+    
+    set did = (select max(delivery_address_id) from delivery_address where d.customer_id=cust_id);
+    
+    Set pin = (select delivery_address.pincode from delivery_address where delivery_address.delivery_address_id = did);
+    
+    set min = 5;  
+    set b = 0; 
+    set order_id = (select max(order_no) from orders where orders.customer_id=cust_id limit 1);
+    open cur1;
+    fetch cur1 into a;
+    while b=0 Do
+        if((a-c)<=min) then
+         set min = (a-c);
+        end if;
+         fetch cur1 into a;
+    end while;
+    close cur1;
+
+    if(min<=5) then 
+    set eta = 10;
+    end if;
+    if(min>5 and min<=10) then
+    set eta = 20;
+    end if;
+    if(min>10 and min<=15) then
+    set eta = 30;
+    end if;
+ 
+    insert into tracking_details(order_no,eta,status) values(order_id,eta,'OD');
+ end$$
+DELIMITER ;

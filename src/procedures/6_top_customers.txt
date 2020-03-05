@@ -1,0 +1,73 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `top_2`()
+BEGIN
+     DECLARE b,r,c,qty,i,d int;
+     DECLARE temp_cust_id int(5);
+     DECLARE a varchar(10);
+     DECLARE name varchar(20);
+     DECLARE temp_order_no int(5);
+     DECLARE cust_name varchar(20);
+     DECLARE contact char(10);
+     DECLARE order_time date;
+     DECLARE price,bill_amt,disc,final_price int(11);
+ 
+     BLOCK1: BEGIN
+     DECLARE cur3 cursor for SELECT customer_id from orders group by customer_id order by count(order_no) desc limit 5;
+     DECLARE continue handler for not found set r = 1;
+     open cur3;
+	set r = 0;
+     fetch cur3 into c;
+     WHILE r = 0 DO
+	 set temp_cust_id = c;
+	set cust_name = (select customer.customer_name from customer where customer_id=temp_cust_id limit 1);
+	set contact = (select customer.contact from customer where customer_id=temp_cust_id limit 1);
+
+	BLOCK2: BEGIN
+	DECLARE cur1 CURSOR FOR SELECT order_no from orders where orders.customer_id = temp_cust_id;
+        DECLARE CONTINUE HANDLER FOR NOT FOUND SET b = 1;
+        SET b = 0;        
+        OPEN cur1;     
+        SET b = 0;
+        FETCH cur1 INTO a;
+        WHILE b = 0 DO
+		set temp_order_no = a;
+		set order_time = (select orders.order_date from orders where order_no = temp_order_no);
+
+		set bill_amt = (select bill.bill_amount from bill where order_no = temp_order_no);
+
+		set disc = (select bill.discount from bill where order_no = temp_order_no);
+
+		set final_price = (select bill.bill_total from bill where order_no = temp_order_no);
+		
+
+		BLOCK3: BEGIN
+		DECLARE cur2 CURSOR FOR SELECT item_id from order_details where order_details.order_no = temp_order_no;
+       		DECLARE CONTINUE HANDLER FOR NOT FOUND SET c = 1;
+       		SET c = 0;        
+        	OPEN cur2;     
+        	SET c = 0;
+        	FETCH cur2 INTO d;
+		WHILE c = 0 DO
+			set name = (select food_item.item_name from food_item where item_id=d);
+			set qty = (select order_details.qty from order_details where order_no=temp_order_no and item_id = d);
+			set price = (select order_details.price from order_details where order_no=temp_order_no and item_id = d);
+
+			select temp_cust_id,cust_name,contact,temp_order_no,order_time,d,name,qty,price,bill_amt,disc,final_price;
+
+		fetch cur2 into d;
+		END WHILE;
+		CLOSE cur2;
+       		END BLOCK3;
+		
+        FETCH cur1 INTO a;
+        END WHILE;
+        CLOSE cur1;
+        END BLOCK2;
+
+     fetch cur3 into c;
+     END WHILE;
+      CLOSE cur3;
+      END BLOCK1;
+
+END$$
+DELIMITER ;

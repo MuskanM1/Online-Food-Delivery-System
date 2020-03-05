@@ -1,0 +1,16 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `offer_1`(IN `customer_id1` INT)
+BEGIN
+     DECLARE count1,date int;
+     DECLARE dt date;
+     DECLARE st date;
+     DECLARE discount int;
+     SET count1 = (SELECT count(order_no) from orders where orders.customer_id = customer_id1 group by orders.customer_id);
+     if(count1>=2) then 
+     set discount = 100;
+     set st = (select CURDATE());
+     set dt = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 7 DAY);
+     insert into offer(customer_id,validity_date,disc_amount) values(customer_id1,dt, discount);
+     end if;
+END$$
+DELIMITER ;

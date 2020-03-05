@@ -1,0 +1,7 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `complaint`(IN `order_no` INT, `cust_id` INT, `complaint_type` VARCHAR(50), `complaint_date` DATE)
+BEGIN
+	INSERT INTO complaint(customer_id,order_no,complaint_type,complaint_date) values(cust_id,order_no,complaint_type,complaint_date); 
+END$$
+DELIMITER ;
+

@@ -1,0 +1,33 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `bill_procedure`(IN `cust_id` INT(5))
+BEGIN
+	DECLARE order_id,d int(5);
+	DECLARE c int;
+	DECLARE name varchar(20);
+	DECLARE bill_total,qty,price,final_pr,bill_amount,discount,delivery_fee int(11);
+	DECLARE cur2 CURSOR FOR SELECT order_details.item_id from order_details where order_details.order_no = (select max(order_no) from orders where orders.customer_id=cust_id LIMIT 1);
+       	DECLARE CONTINUE HANDLER FOR NOT FOUND SET c = 1;
+	set order_id = (select max(order_no) from orders where orders.customer_id=cust_id limit 1);
+	set bill_total = (select bill.bill_total from bill where bill.order_no=order_id limit 1); 
+    set bill_amount = (SELECT bill.bill_amount from bill where bill.order_no=order_id limit 1); 
+    set discount = (SELECT bill.discount from bill where bill.order_no=order_id limit 1); 
+    set delivery_fee = (SELECT bill.delivery_fee from bill where bill.order_no=order_id limit 1); 
+       	OPEN cur2;     
+       	SET c = 0;
+       	FETCH cur2 INTO d;
+	WHILE c = 0 DO
+		set name = (select food_item.item_name from food_item where item_id=d);
+		set qty = (select order_details.qty from order_details where order_no=order_id and item_id = d);
+		set price = (select order_details.price from order_details where order_no=order_id and item_id = d limit 1);
+		set final_pr = (select final_price from order_details where order_no=order_id and item_id = d);
+		
+		select order_id as ord_id,d,name,qty,price,final_pr,bill_amount,discount,delivery_fee,bill_total;
+        FETCH cur2 INTO d;
+	END WHILE;
+	CLOSE cur2;
+END$$
+DELIMITER ;
+
+
+
+
