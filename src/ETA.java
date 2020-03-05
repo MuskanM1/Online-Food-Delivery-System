@@ -1,18 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package javaapplication6;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Scanner;
-/**
- *
- * @author devshreepatel
- */
+
 public class ETA {
     Scanner scan =new Scanner(System.in);
 	public static void eta(int restaurant_id,int cust_id)
